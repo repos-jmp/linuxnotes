@@ -1,0 +1,52 @@
+Steps  to covert Surfshark's deb package to rpm.
+
+On Fedora -
+install alien -> sudo dnf install alien
+install rpmrebuild -> sudo dnf install rpmrebuild
+
+Download Surfshark debian package -> find the latest file in https://ocean.surfshark.com/debian/pool/main/s/
+In this case it is -> https://ocean.surfshark.com/debian/pool/main/s/surfshark/surfshark_1.2.6-1508_amd64.deb
+
+Make sure downloaded file has appropriate permissions -> chmod 775 surfshark_1.2.6-1508_amd64.deb
+
+Covert rpm to deb using alien -> sudo alien -r -c -v surfshark_1.2.6-1508_amd64.deb
+
+Remove directory conflict lines from spec -> rpmrebuild -pe surfshark_1.2.6-1508_amd64.rpm
+
+%dir %attr(0777, root, root) "/etc"
+%dir %attr(0777, root, root) "/etc/init.d"
+%dir %attr(0755, root, root) "/opt"
+%dir %attr(0777, root, root) "/usr/"
+%dir %attr(0777, root, root) "/usr/lib"
+%dir %attr(0755, root, root) "/usr/lib/.build-id"
+.
+.
+(Remove everything that has /usr/lib/.build-id/...)
+%dir %attr(0777, root, root) "/usr/lib/systemd"
+%dir %attr(0777, root, root) "/usr/lib/systemd/system"
+%dir %attr(0777, root, root) "/usr/lib/systemd/user"
+%dir %attr(0755, root, root) "/usr/share"
+%dir %attr(0755, root, root) "/usr/share/applications"
+%dir %attr(0755, root, root) "/usr/share/doc"
+%dir %attr(0755, root, root) "/usr/share/icons"
+%dir %attr(0755, root, root) "/usr/share/icons/hicolor"
+%dir %attr(0755, root, root) "/usr/share/icons/hicolor/128x128"
+%dir %attr(0755, root, root) "/usr/share/icons/hicolor/128x128/apps"
+%dir %attr(0777, root, root) "/var"
+%dir %attr(0777, root, root) "/var/lib"
+
+save file
+continue with rpmrebuild - press y
+
+rpm is generated, path of file is shown
+go to path, chmod to executable
+
+sudo dnf install <generated_file_name>.rpm
+
+sudo chmod 744 /usr/lib/systemd/user/surfsharkd.service
+
+Remove surfshark_1.2.6-1508_amd64.deb -> rm surfshark_1.2.6-1508_amd64.deb
+Remove intermediate rpm 
+chmod <generated_file_name>.rpm to 744
+
+Enjoy!
